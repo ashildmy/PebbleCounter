@@ -25,9 +25,6 @@ void up_single_click_handler(ClickRecognizerRef recognizer, void *context){
 }
 
 void down_single_click_handler(ClickRecognizerRef recognizer, void *context){
-  /* if(shots > 0){ */
-  /*   shots--;   */
-  /* } */
   misses++;
   shots++;
   percent = (hits * 100) / shots;
@@ -38,10 +35,25 @@ void down_single_click_handler(ClickRecognizerRef recognizer, void *context){
   text_layer_set_text(scoreboard_layer, scoreboard_text);
 }
 
+void select_long_click_handler(ClickRecognizerRef recognizer, void *context){
+  misses = 0;
+  hits = 0;
+  shots = 0;
+
+  text_layer_set_text(scoreboard_layer, "Hits: 0\nMisses: 0\nShots: 0");
+  text_layer_set_text(count_layer, "0%");
+}
+
+void select_long_click_release_handler(ClickRecognizerRef recognizer, void *context){
+  
+}
+
 void config_provider(Window *window){
   window_single_click_subscribe(BUTTON_ID_UP, up_single_click_handler);
   
   window_single_click_subscribe(BUTTON_ID_DOWN, down_single_click_handler);
+
+  window_long_click_subscribe(BUTTON_ID_SELECT, 700, select_long_click_handler, select_long_click_release_handler);
 }
 
 static void create_count_text(Layer* window_layer) {
@@ -93,7 +105,6 @@ static void init(void) {
   window_set_click_config_provider(window, (ClickConfigProvider) config_provider);
 
   Layer *window_layer = window_get_root_layer(window);	
-  GRect bounds = layer_get_frame(window_layer);
 
   create_count_text(window_layer);
   create_hit_text(window_layer);
