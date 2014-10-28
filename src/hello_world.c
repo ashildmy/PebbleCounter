@@ -1,20 +1,31 @@
 #include <pebble.h>
 
 int shots;
+int hits;
+int percent;
 
 static Window *window;
 static TextLayer *count_layer;
+static char shot_text[1024];
 
 void up_single_click_handler(ClickRecognizerRef recognizer, void *context){
+  hits++;
   shots++;  
-  APP_LOG(0, "%i\n", shots);
+  percent = (hits * 100) / shots;
+  APP_LOG(0, "%i %i %i\n", hits, shots, percent);
+  snprintf(shot_text, (6 * sizeof(char)), "%i %c", percent, '%');
+  text_layer_set_text(count_layer, shot_text);
 }
 
 void down_single_click_handler(ClickRecognizerRef recognizer, void *context){
-  if(shots > 0){
-    shots--;  
-  }
-  APP_LOG(0, "%i\n", shots);
+  /* if(shots > 0){ */
+  /*   shots--;   */
+  /* } */
+  shots++;
+  percent = (hits * 100) / shots;
+  APP_LOG(0, "%i %i %i\n", hits, shots, percent);
+  snprintf(shot_text, (6 * sizeof(char)), "%i %c", percent, '%');
+  text_layer_set_text(count_layer, shot_text);
 }
 
 void config_provider(Window *window){
@@ -25,7 +36,7 @@ void config_provider(Window *window){
 
 static void create_count_text(Layer* window_layer) {
   count_layer = text_layer_create((GRect(0, 40, 144, 100)));
-  text_layer_set_text(count_layer, "0");
+  text_layer_set_text(count_layer, "0%%");
   text_layer_set_text_color(count_layer, GColorBlack);
   text_layer_set_font(count_layer,  fonts_get_system_font(FONT_KEY_ROBOTO_BOLD_SUBSET_49));
   text_layer_set_text_alignment(count_layer, GTextAlignmentCenter);
