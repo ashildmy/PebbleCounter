@@ -6,6 +6,7 @@ int percent;
 
 static Window *window;
 static TextLayer *count_layer;
+static TextLayer *hit_layer;
 static char shot_text[1024];
 
 void up_single_click_handler(ClickRecognizerRef recognizer, void *context){
@@ -13,7 +14,7 @@ void up_single_click_handler(ClickRecognizerRef recognizer, void *context){
   shots++;  
   percent = (hits * 100) / shots;
   APP_LOG(0, "%i %i %i\n", hits, shots, percent);
-  snprintf(shot_text, (6 * sizeof(char)), "%i %c", percent, '%');
+  snprintf(shot_text, (6 * sizeof(char)), "%i%c", percent, '%');
   text_layer_set_text(count_layer, shot_text);
 }
 
@@ -24,7 +25,7 @@ void down_single_click_handler(ClickRecognizerRef recognizer, void *context){
   shots++;
   percent = (hits * 100) / shots;
   APP_LOG(0, "%i %i %i\n", hits, shots, percent);
-  snprintf(shot_text, (6 * sizeof(char)), "%i %c", percent, '%');
+  snprintf(shot_text, (6 * sizeof(char)), "%i%c", percent, '%');
   text_layer_set_text(count_layer, shot_text);
 }
 
@@ -35,12 +36,21 @@ void config_provider(Window *window){
 }
 
 static void create_count_text(Layer* window_layer) {
-  count_layer = text_layer_create((GRect(0, 40, 144, 100)));
-  text_layer_set_text(count_layer, "0%%");
+  count_layer = text_layer_create(GRect(0, 55, 144, 168));
+  text_layer_set_text(count_layer, "0%");
   text_layer_set_text_color(count_layer, GColorBlack);
-  text_layer_set_font(count_layer,  fonts_get_system_font(FONT_KEY_ROBOTO_BOLD_SUBSET_49));
+  text_layer_set_font(count_layer,  fonts_get_system_font(FONT_KEY_GOTHIC_28));
   text_layer_set_text_alignment(count_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(count_layer));
+}
+
+static void create_hit_text(Layer* window_layer){
+  count_layer = text_layer_create(GRect(0, 25, 144, 168));
+  text_layer_set_text(hit_layer, "Hit ->");
+  text_layer_set_text_color(hit_layer, GColorBlack);
+  text_layer_set_font(hit_layer,  fonts_get_system_font(FONT_KEY_GOTHIC_28));
+  text_layer_set_text_alignment(hit_layer, GTextAlignmentRight);
+  layer_add_child(window_layer, text_layer_get_layer(hit_layer));
 }
 
 static void init(void) {
@@ -55,6 +65,7 @@ static void init(void) {
   GRect bounds = layer_get_frame(window_layer);
 
   create_count_text(window_layer);
+  create_hit_text(window_layer);
 }
 
 static void deinit(void) {
