@@ -1,37 +1,51 @@
 #include <pebble.h>
+#include "util.h"
 
 int shots;
 int hits;
-int percent;
 int misses;
+float percent;
 
 static Window *window;
+static Window *startWindow;
 static TextLayer *count_layer;
 static TextLayer *hit_layer;
 static TextLayer *miss_layer;
 static TextLayer *scoreboard_layer;
 static char shot_text[1024];
 static char scoreboard_text[1024];
+static char percent_text[1024];
+
 
 void up_single_click_handler(ClickRecognizerRef recognizer, void *context){
   hits++;
   shots++;  
-  percent = (hits * 100) / shots;
-  APP_LOG(0, "%i %i %i\n", hits, shots, percent);
-  snprintf(shot_text, (6 * sizeof(char)), "%i%c", percent, '%');
+  percent = (float)hits / shots;
+  floatToString(percent_text, sizeof(percent_text), percent);
+  strcat(percent_text, "%");
+  /* APP_LOG(0, "%s", percent_text); */
+  /* percent = (hits * 100) / shots; */
+  /* APP_LOG(0, "%i %i\n", hits, shots); */
+  /* snprintf(shot_text, (6 * sizeof(char)), "%i%c", percent, '%'); */
   snprintf(scoreboard_text, (40 * sizeof(char)), "Hits: %i\nMisses: %i\nShots: %i", hits, misses, shots);
-  text_layer_set_text(count_layer, shot_text);
+  /* text_layer_set_text(count_layer, shot_text); */
+  text_layer_set_text(count_layer, percent_text);
   text_layer_set_text(scoreboard_layer, scoreboard_text);
 }
 
 void down_single_click_handler(ClickRecognizerRef recognizer, void *context){
   misses++;
   shots++;
-  percent = (hits * 100) / shots;
-  APP_LOG(0, "%i %i %i\n", hits, shots, percent);
-  snprintf(shot_text, (6 * sizeof(char)), "%i%c", percent, '%');
+  percent = (float)hits / shots;
+  floatToString(percent_text, sizeof(percent_text), percent);
+  strcat(percent_text, "%");
+  /* APP_LOG(0, "%s", percent_text); */
+  /* percent = (hits * 100) / shots; */
+  /* APP_LOG(0, "%i %i\n", hits, shots); */
+  /* snprintf(shot_text, (6 * sizeof(char)), "%i%c", percent, '%'); */
   snprintf(scoreboard_text, (40 * sizeof(char)), "Hits: %i\nMisses: %i\nShots: %i", hits, misses, shots);
-  text_layer_set_text(count_layer, shot_text);
+  /* text_layer_set_text(count_layer, shot_text); */
+  text_layer_set_text(count_layer, percent_text);
   text_layer_set_text(scoreboard_layer, scoreboard_text);
 }
 
@@ -41,7 +55,7 @@ void select_long_click_handler(ClickRecognizerRef recognizer, void *context){
   shots = 0;
 
   text_layer_set_text(scoreboard_layer, "Hits: 0\nMisses: 0\nShots: 0");
-  text_layer_set_text(count_layer, "0%");
+  text_layer_set_text(count_layer, "0.00%");
 }
 
 void select_long_click_release_handler(ClickRecognizerRef recognizer, void *context){
@@ -58,15 +72,15 @@ void config_provider(Window *window){
 
 static void create_count_text(Layer* window_layer) {
   count_layer = text_layer_create(GRect(0, 55, 144, 168));
-  text_layer_set_text(count_layer, "0%");
+  text_layer_set_text(count_layer, "0.00%");
   text_layer_set_text_color(count_layer, GColorBlack);
-  text_layer_set_font(count_layer,  fonts_get_system_font(FONT_KEY_GOTHIC_28));
+  text_layer_set_font(count_layer,  fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
   text_layer_set_text_alignment(count_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(count_layer));
 }
 
 static void create_hit_text(Layer* window_layer){
-  hit_layer = text_layer_create(GRect(0, 5, 144, 168));
+  hit_layer = text_layer_create(GRect(0, 0, 144, 168));
   text_layer_set_text(hit_layer, "Hit->");
   text_layer_set_text_color(hit_layer, GColorBlack);
   text_layer_set_background_color(hit_layer, GColorClear);
@@ -76,7 +90,7 @@ static void create_hit_text(Layer* window_layer){
 }
 
 static void create_miss_text(Layer* window_layer){
-  miss_layer = text_layer_create(GRect(0, 120, 144, 168));
+  miss_layer = text_layer_create(GRect(0, 115, 144, 168));
   text_layer_set_text(miss_layer, "Miss->");
   text_layer_set_text_color(miss_layer, GColorBlack);
   text_layer_set_background_color(miss_layer, GColorClear);
@@ -97,6 +111,8 @@ static void create_scoreboard_text(Layer* window_layer){
 static void init(void) {
   window = window_create();
   window_stack_push(window, true);
+  /* startWindow = window_create(); */
+  /* window_stack_push(startWindow, true); */
 
   shots = 0;
   hits = 0;
@@ -114,7 +130,11 @@ static void init(void) {
 
 static void deinit(void) {
   text_layer_destroy(count_layer);
+  text_layer_destroy(hit_layer);
+  text_layer_destroy(scoreboard_layer);
+  text_layer_destroy(miss_layer);
   window_destroy(window);
+  /* window_destroy(startWindow); */
 }
 
 int main(void) {
