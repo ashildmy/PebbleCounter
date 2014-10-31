@@ -6,6 +6,7 @@ int hits;
 int misses;
 int tempHit = 0;
 int pad = 5;
+int maxStreak = 0;
 float percent;
 
 static Window *window;
@@ -28,6 +29,7 @@ void up_single_click_handler(ClickRecognizerRef recognizer, void *context){
   floatToString(percent_text, sizeof(percent_text), percent);
   strcat(percent_text, "%");
   snprintf(scoreboard_text, (40 * sizeof(char)), "Hits: %i\nMisses: %i\nShots: %i", hits, misses, shots);
+
   if(tempHit == 2){
     text_layer_set_text(fire_status_layer, "Heating Up!");
     vibes_double_pulse();
@@ -35,6 +37,11 @@ void up_single_click_handler(ClickRecognizerRef recognizer, void *context){
     text_layer_set_text(fire_status_layer, "Fire!");
     vibes_long_pulse();
   }
+  
+  if(maxStreak < hits){
+    maxStreak = hits;
+  }
+  
   text_layer_set_text(count_layer, percent_text);
   text_layer_set_text(scoreboard_layer, scoreboard_text);
 }
@@ -57,6 +64,7 @@ void select_long_click_handler(ClickRecognizerRef recognizer, void *context){
   hits = 0;
   shots = 0;
   tempHit = 0;
+  maxStreak = 0;
 
   text_layer_set_text(scoreboard_layer, "Hits: 0\nMisses: 0\nShots: 0");
   text_layer_set_text(count_layer, "0.00%");
@@ -137,6 +145,7 @@ static void init(void) {
   shots = 0;
   hits = 0;
   misses = 0;
+  maxStreak = 0;
 
   window_set_click_config_provider(window, (ClickConfigProvider) config_provider);
 
