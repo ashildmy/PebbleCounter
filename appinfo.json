@@ -18,7 +18,11 @@
         "type": "png",
         "name": "IMAGE_MENU_ICON_TARGET",
         "file": "images/target.png"
-      }
+      },
+      {
+        "type": "font",
+        "name": "HELVETICA_NEUE_BOLD_34",
+        "file": "fonts/HelveticaNeue-Bold.ttf" }
     ]
   }
 }
